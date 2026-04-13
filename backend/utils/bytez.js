@@ -68,6 +68,47 @@ function mockAIResponse(systemPrompt) {
             }
         ]);
     }
+    if (systemPrompt.includes("ATS Resume Optimizer") || systemPrompt.includes("Optimize")) {
+        return `PROFESSIONAL SUMMARY
+Experienced Full Stack Developer with 3+ years of expertise in building scalable web applications using modern JavaScript frameworks. Proven track record of delivering high-quality solutions with measurable impact.
+
+TECHNICAL SKILLS
+• Programming Languages: JavaScript (ES6+), TypeScript, Python
+• Frontend: React.js, Next.js, HTML5, CSS3, Tailwind CSS
+• Backend: Node.js, Express.js, REST APIs
+• Databases: MongoDB, PostgreSQL
+• Tools: Git, Docker, CI/CD, AWS, Agile/Scrum
+
+PROFESSIONAL EXPERIENCE
+Full Stack Developer | Tech Company | 2021 - Present
+• Developed and maintained 5+ production web applications serving 10,000+ daily users
+• Reduced page load time by 40% through code optimization and lazy loading strategies
+• Implemented RESTful APIs handling 1M+ requests/month with 99.9% uptime
+• Led migration from legacy codebase to React/Next.js, improving developer velocity by 60%
+
+EDUCATION
+Bachelor of Technology in Computer Science | University | 2021
+• GPA: 3.8/4.0 | Relevant Coursework: Data Structures, Algorithms, Web Development`;
+    }
+    if (systemPrompt.includes("ATS scoring expert") || systemPrompt.includes("atsScore")) {
+        return JSON.stringify({
+            atsScore: 82,
+            suggestions: [
+                "Add more quantifiable achievements with specific metrics",
+                "Include keywords: Docker, Kubernetes, CI/CD pipeline experience",
+                "Add a 'Projects' section highlighting relevant personal/open-source projects",
+                "Optimize summary to include target job title and years of experience",
+                "Use action verbs consistently (Developed, Implemented, Led, Designed)"
+            ],
+            skillGaps: ["Docker", "Kubernetes", "AWS Lambda", "GraphQL"],
+            matchedSkills: ["JavaScript", "React", "Node.js", "MongoDB", "Express", "Next.js", "TypeScript"],
+            keywordDensity: {
+                total: 18,
+                matched: 12,
+                missing: ["Docker", "Kubernetes", "CI/CD", "GraphQL", "Microservices", "Unit Testing"]
+            }
+        });
+    }
     return "Mock response from AI.";
 }
 

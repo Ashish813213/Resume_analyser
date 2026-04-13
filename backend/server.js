@@ -49,10 +49,12 @@ app.use(cors());
 // Import Routes
 const authRoute = require('./routes/authRoutes');
 const resumeRoute = require('./routes/resumeRoutes');
+const optimizeRoute = require('./routes/optimizeRoutes');
 
 // Route Middlewares
 app.use('/api/user', authRoute);
 app.use('/api/resume', resumeRoute);
+app.use('/api/optimize', optimizeRoute);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server Up and Running on port ${PORT}`));

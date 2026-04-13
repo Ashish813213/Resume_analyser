@@ -1,111 +1,203 @@
 "use client";
-import React, { useState } from 'react';
-import axios from 'axios';
-import { Briefcase, Check, X } from 'lucide-react';
+import React, { useState } from "react";
+import axios from "axios";
+import {
+    Briefcase,
+    CheckCircle2,
+    XCircle,
+    Loader2,
+    Target,
+} from "lucide-react";
 
 export default function MatchJobPage() {
-    const [jobDescription, setJobDescription] = useState('');
+    const [jobDescription, setJobDescription] = useState("");
     const [matchResult, setMatchResult] = useState<any>(null);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+    const [error, setError] = useState("");
 
     const handleMatch = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setError('');
+        setError("");
 
         try {
-            const token = localStorage.getItem('token');
-            const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/resume/match`,
+            const token = localStorage.getItem("token");
+            const res = await axios.post(
+                `${process.env.NEXT_PUBLIC_API_URL}/resume/match`,
                 { jobDescription },
-                { headers: { 'auth-token': token } }
+                { headers: { "auth-token": token } }
             );
             setMatchResult(res.data);
         } catch (err: any) {
-            setError(err.response?.data || 'Matching failed. Ensure you have uploaded a resume.');
+            setError(
+                err.response?.data ||
+                    "Matching failed. Ensure you have uploaded a resume."
+            );
         } finally {
             setLoading(false);
         }
     };
 
+    const score = matchResult?.matchScore || 0;
+    const scoreColor =
+        score > 70
+            ? "text-[rgb(61,49,90)]"
+            : score > 40
+            ? "text-[rgb(93,79,128)]"
+            : "text-[rgb(123,107,157)]";
+    const scoreGradient =
+        score > 70 ? "#b4d3d9" : score > 40 ? "#bda6ce" : "#9b8ec7";
+
     return (
         <div className="max-w-4xl mx-auto space-y-8">
-            <h1 className="text-3xl font-bold text-gray-800">Job Match Analysis</h1>
+            <div>
+                <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
+                    <Target className="text-indigo-400" size={28} />
+                    Job Match Analysis
+                </h1>
+                <p className="text-slate-400 mt-1">
+                    Compare your resume against a job description
+                </p>
+            </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-md">
-                <form onSubmit={handleMatch}>
-                    <label className="block text-gray-700 font-semibold mb-2">Job Description</label>
+            <div className="glass-card p-6">
+                <form onSubmit={handleMatch} className="space-y-4">
+                    <label className="block text-slate-300 font-semibold text-sm mb-1">
+                        Job Description
+                    </label>
                     <textarea
                         value={jobDescription}
                         onChange={(e) => setJobDescription(e.target.value)}
-                        className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent h-40"
+                        className="input-premium h-40 resize-none"
                         placeholder="Paste the job description here..."
                         required
                     />
                     <button
                         type="submit"
                         disabled={loading || !jobDescription}
-                        className="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors flex items-center gap-2"
+                        className="btn-primary"
                     >
-                        {loading ? 'Analyzing...' : <><Briefcase size={20} /> Analyze Match</>}
+                        {loading ? (
+                            <>
+                                <Loader2
+                                    size={18}
+                                    className="animate-spin"
+                                />
+                                Analyzing...
+                            </>
+                        ) : (
+                            <>
+                                <Briefcase size={18} />
+                                Analyze Match
+                            </>
+                        )}
                     </button>
                 </form>
-                {error && <p className="text-red-500 mt-2">{error}</p>}
+                {error && (
+                    <p className="text-red-400 mt-3 text-sm">{error}</p>
+                )}
             </div>
 
             {matchResult && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4">
-                    {/* Score Card */}
-                    <div className="bg-white p-6 rounded-xl shadow-md col-span-1 md:col-span-3 text-center">
-                        <h3 className="text-lg font-semibold text-gray-600 mb-2">Match Score</h3>
-                        <div className="relative inline-flex items-center justify-center">
-                            <svg className="w-32 h-32 transform -rotate-90">
-                                <circle cx="64" cy="64" r="56" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-gray-200" />
+                <div className="space-y-6">
+                    {/* Score */}
+                    <div className="glass-card p-8 text-center bg-gradient-to-br from-indigo-500/5 to-purple-500/5">
+                        <h3 className="text-sm text-slate-400 uppercase tracking-wider mb-4">
+                            Match Score
+                        </h3>
+                        <div className="score-ring inline-flex">
+                            <svg width="140" height="140">
                                 <circle
-                                    cx="64" cy="64" r="56"
-                                    stroke="currentColor" strokeWidth="12" fill="transparent"
+                                    cx="70"
+                                    cy="70"
+                                    r="56"
+                                    stroke="rgba(155,142,199,0.22)"
+                                    strokeWidth="10"
+                                    fill="transparent"
+                                />
+                                <circle
+                                    cx="70"
+                                    cy="70"
+                                    r="56"
+                                    stroke={scoreGradient}
+                                    strokeWidth="10"
+                                    fill="transparent"
+                                    strokeLinecap="round"
                                     strokeDasharray={351.86}
-                                    strokeDashoffset={351.86 - (351.86 * matchResult.matchScore) / 100}
-                                    className={`${matchResult.matchScore > 70 ? 'text-green-500' : matchResult.matchScore > 40 ? 'text-yellow-500' : 'text-red-500'} transition-all duration-1000 ease-out`}
+                                    strokeDashoffset={
+                                        351.86 - (351.86 * score) / 100
+                                    }
+                                    style={{
+                                        transition:
+                                            "stroke-dashoffset 1.5s ease",
+                                        filter: `drop-shadow(0 0 8px ${scoreGradient}40)`,
+                                    }}
                                 />
                             </svg>
-                            <span className="absolute text-3xl font-bold text-gray-800">{matchResult.matchScore}%</span>
+                            <span
+                                className={`score-value text-3xl ${scoreColor}`}
+                            >
+                                {score}%
+                            </span>
                         </div>
                     </div>
 
-                    {/* Matched Skills */}
-                    <div className="bg-green-50 p-6 rounded-xl border border-green-200 col-span-1 md:col-span-1.5">
-                        <h3 className="text-lg font-bold text-green-800 mb-4 flex items-center gap-2">
-                            <Check size={20} /> Matched Skills
-                        </h3>
-                        <div className="flex flex-wrap gap-2">
-                            {matchResult.matchedSkills.length > 0 ? (
-                                matchResult.matchedSkills.map((skill: string, i: number) => (
-                                    <span key={i} className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium border border-green-200">
-                                        {skill}
-                                    </span>
-                                ))
-                            ) : (
-                                <p className="text-green-600 italic">No direct matches found.</p>
-                            )}
+                    {/* Skills */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <div className="glass-card p-6">
+                            <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
+                                <CheckCircle2
+                                    size={18}
+                                    className="text-emerald-400"
+                                />
+                                Matched Skills
+                            </h3>
+                            <div className="flex flex-wrap gap-2">
+                                {matchResult.matchedSkills?.length > 0 ? (
+                                    matchResult.matchedSkills.map(
+                                        (skill: string, i: number) => (
+                                            <span
+                                                key={i}
+                                                className="skill-chip skill-chip-matched"
+                                            >
+                                                {skill}
+                                            </span>
+                                        )
+                                    )
+                                ) : (
+                                    <p className="text-slate-500 text-sm italic">
+                                        No direct matches
+                                    </p>
+                                )}
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Missing Skills */}
-                    <div className="bg-red-50 p-6 rounded-xl border border-red-200 col-span-1 md:col-span-1.5">
-                        <h3 className="text-lg font-bold text-red-800 mb-4 flex items-center gap-2">
-                            <X size={20} /> Missing Skills
-                        </h3>
-                        <div className="flex flex-wrap gap-2">
-                            {matchResult.missingSkills.length > 0 ? (
-                                matchResult.missingSkills.map((skill: string, i: number) => (
-                                    <span key={i} className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-medium border border-red-200">
-                                        {skill}
-                                    </span>
-                                ))
-                            ) : (
-                                <p className="text-red-600 italic">No missing skills detected!</p>
-                            )}
+                        <div className="glass-card p-6">
+                            <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
+                                <XCircle
+                                    size={18}
+                                    className="text-red-400"
+                                />
+                                Missing Skills
+                            </h3>
+                            <div className="flex flex-wrap gap-2">
+                                {matchResult.missingSkills?.length > 0 ? (
+                                    matchResult.missingSkills.map(
+                                        (skill: string, i: number) => (
+                                            <span
+                                                key={i}
+                                                className="skill-chip skill-chip-missing"
+                                            >
+                                                {skill}
+                                            </span>
+                                        )
+                                    )
+                                ) : (
+                                    <p className="text-emerald-400 text-sm font-medium">
+                                        🎉 No missing skills!
+                                    </p>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
